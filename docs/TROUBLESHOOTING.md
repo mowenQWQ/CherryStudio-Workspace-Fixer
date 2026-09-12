@@ -117,7 +117,7 @@ Cherry Studio 数据整体搬迁（C 盘 → 其他盘）后，打开旧 Agent �
 
 ### 官方状态
 
-- GitHub **#20363**（已 assign 官方维护者认领）、**#18373**（p1，已 assign）——2.0.14 仍未修复。
+- GitHub **#20363**（已 assign 官方维护者 **404-Page-Found** 认领）、**#18373**（p1，已 assign kangfenmao）——2.0.14 仍未修复。
 - 官方修复前，客户端兜底用 `scripts\log_guard.bat`（v2.0.0 新增）：
 
 ```bat

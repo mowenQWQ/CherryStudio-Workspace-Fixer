@@ -38,7 +38,7 @@ scripts\toolbox.bat
 
 ### 日志炸弹防护（v2.0.0 新增）
 
-Cherry Studio 2.x 的 `AI_APICallError` 错误处理器会把完整 requestBody（含 system prompt 与全部工具定义）序列化进日志，provider 503 / `model route not found` 触发时可**单条数 MB、GB/h 级膨胀**（GitHub #20363 已认领 assign / #18373 p1，2.0.14 仍存在）。官方修复前用本工具兜底：
+Cherry Studio 2.x 的 `AI_APICallError` 错误处理器会把完整 requestBody（含 system prompt 与全部工具定义）序列化进日志，provider 503 / `model route not found` 触发时可**单条数 MB、GB/h 级膨胀**（GitHub #20363 已由官方维护者 404-Page-Found 认领 / #18373 p1，2.0.14 仍存在）。官方修复前用本工具兜底：
 
 ```bat
 rem 只读报告（默认）: 列出超大日志, 估算总大小
@@ -109,7 +109,7 @@ Menu: `[1] Log-bomb report & cleanup`, `[2] Fix workspace paths`, `[3] Probe lef
 
 ### Log-bomb guard (new in v2.0.0)
 
-Cherry Studio 2.x's `AI_APICallError` handler serializes the full requestBody (system prompt + all tool definitions) into logs; a provider 503 / `model route not found` can grow a single line to several MB and the dir by GB/h (GitHub #20363 assigned / #18373 p1, still present in 2.0.14). Mitigate until official fix:
+Cherry Studio 2.x's `AI_APICallError` handler serializes the full requestBody (system prompt + all tool definitions) into logs; a provider 503 / `model route not found` can grow a single line to several MB and the dir by GB/h (GitHub #20363 assigned to maintainer 404-Page-Found / #18373 p1, still present in 2.0.14). Mitigate until official fix:
 
 ```bat
 rem Read-only report (default): list oversized logs, estimate total size

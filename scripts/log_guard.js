@@ -107,7 +107,7 @@ console.log('');
 if (bombs.length > 0) {
     console.log('WARNING: found ' + bombs.length + ' oversized log file(s) — this is the known Cherry Studio');
     console.log('         logging bug (full requestBody written into logs on AI API errors).');
-    console.log('         GitHub: #20363 (assigned), #18373 (p1 assigned). Still present in 2.0.14.');
+    console.log('         GitHub: #20363 (assigned to 404-Page-Found), #18373 (p1, kangfenmao). Still present in 2.0.14.');
     console.log('         Mitigation: run with --clean to keep only the last ' + RETAIN_HOURS + 'h of logs.');
     console.log('');
 }
