@@ -13,15 +13,36 @@ function findLatestBackup(f) {
     const dir = path.dirname(f);
     const base = path.basename(f);
     if (!fs.existsSync(dir)) return null;
-    const matches = fs.readdirSync(dir).filter(n => n.startsWith(base + '.bak-'));
+    // 排除 -wal / -shm (SQLite 副作用文件), 它们不是真正的备份本体
+    const matches = fs.readdirSync(dir)
+        .filter(n => n.startsWith(base + '.bak-') && !/-wal$/.test(n) && !/-shm$/.test(n));
     if (!matches.length) return null;
     matches.sort();
     return path.join(dir, matches[matches.length - 1]);
 }
 
-const defDb = (process.env.APPDATA || process.env.HOME || '').replace(/\\/g, '/') + '/CherryStudio/Data/cherrystudio.sqlite';
-const CUR = process.argv[3] || process.argv[2] || defDb;
-const BAK = process.argv[3] ? process.argv[2] : findLatestBackup(CUR);
+// ---------- DB 自动探测 ----------
+function detectDb(explicit) {
+    if (explicit && fs.existsSync(explicit)) return explicit;
+    const candidates = [
+        explicit,
+        'E:/ai/Chreey Studio/Data/cherrystudio.sqlite',
+        'E:/CherryStudio/Data/cherrystudio.sqlite',
+        'D:/CherryStudio/Data/cherrystudio.sqlite',
+        (process.env.APPDATA || '').replace(/\\/g, '/') + '/CherryStudio/Data/cherrystudio.sqlite',
+    ].filter(Boolean);
+    for (const c of candidates) {
+        if (fs.existsSync(c)) return c;
+    }
+    return candidates[candidates.length - 1];
+}
+
+// 用法: node check_agent_data.js [当前库]          单参数自动找最新 .bak-时间戳
+//       node check_agent_data.js [备份库] [当前库]  双参数显式指定
+const A1 = process.argv[2];
+const A2 = process.argv[3];
+const CUR = A2 ? detectDb(A2) : detectDb(A1);
+const BAK = A2 ? detectDb(A1) : findLatestBackup(CUR);
 
 function open(p) {
     if (!fs.existsSync(p)) { console.log('MISSING: ' + p); return null; }

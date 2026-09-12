@@ -93,3 +93,54 @@ Cherry Studio 数据整体搬迁（C 盘 → 其他盘）后，打开旧 Agent �
 
 **报错路径随对话变化 == 每个对话有独立工作区路径记录 == 查数据库 `agent_workspace.path`。**
 这是本案例最值得记住的一条经验。
+
+---
+
+## 10. 日志炸弹（Cherry Studio 2.x 错误日志 GB 级膨胀）与 log_guard
+
+> 这是**另一个问题**（与路径修复无关），但与本工具同为 Cherry Studio 的配套运维事项，v2.0.0 起并入工具箱。
+
+### 现象
+
+- `%APPDATA%\CherryStudio\logs` 目录快速膨胀，单文件动辄 10–20 MB，总量可达 GB 级（实测 83 文件 / 1.1 GB）。
+- 日志文件命名规律：`app.YYYY-MM-DD.log.N` 与 `app-error.YYYY-MM-DD.log.N`（N 为滚动序号，两份内容几乎相同）。
+
+### 触发链（2026-09-12 实测证据）
+
+```
+中转站未响应 / model route not found → AI Router 收 503/404
+  → Cherry Studio 错误处理器 AI_APICallError 全量序列化 requestBody
+      （完整 system prompt + 数百个 tool 定义 + 所有 tool_calls）
+  → 单条日志可达 3.7 MB（实测单行 3711997 字节）
+  → 每次错误写两份（app + app-error）→ 速率约 3.75 GB/h，24h 可达 80+ GB
+```
+
+### 官方状态
+
+- GitHub **#20363**（open）、**#18373**（p1，已 assign）——2.0.14 仍未修复。
+- 官方修复前，客户端兜底用 `scripts\log_guard.bat`（v2.0.0 新增）：
+
+```bat
+rem 只读报告
+scripts\log_guard.bat
+
+rem 清理: 保留最近 2h, 删除更早的超大文件(先备份 + 确认 + 复查)
+scripts\log_guard.bat --clean --retain-hours 2
+```
+
+### log_guard 安全设计
+
+| 点 | 做法 |
+|---|---|
+| 只动日志 | 仅处理 logs 目录内 `*.log*`，绝不碰其它路径 |
+| 保留正在写的 | mtime 在 retain-hours 内的文件（含正在写入的）不列入候选 |
+| 先备份后删 | 删除前复制到 `logs\.guard-backup-<时间戳>\`（`--no-backup` 可关） |
+| 二次确认 | 删除前列出全部候选并请求 y/n 确认（`--yes` 跳过） |
+| 清理后复查 | 输出剩余 .log 大小，与清理前对比 |
+| 运行不冲突 | Cherry Studio 运行中也能安全跑（不删保留期文件） |
+
+### 经验沉淀（通用）
+
+1. **生产环境错误日志只留元数据**（模块/时间/状态码/request id），requestBody 最多截断 1–4 KB，必须有保留策略。
+2. **定时清理是兜底不是解决**，源头（官方修好）解决后应撤销；本工具设计为手动跑，不装定时任务。
+3. 识别炸弹的快速办法：`ls -lS` 看日志目录里有没有远超其它文件的巨型文件。

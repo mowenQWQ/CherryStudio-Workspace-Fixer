@@ -1,11 +1,29 @@
 // Cherry Studio Workspace Fixer - probe_workspace_db.js
 // 只读探测: 扫描数据库中所有含旧路径(/旧根关键字)的表/列/行
 // 用法: node probe_workspace_db.js [数据库路径] [关键字]
+// 不传数据库路径时, 自动探测候选位置中第一个存在的库。
 
 const { DatabaseSync } = require('node:sqlite');
+const fs = require('fs');
 
-const defDb = (process.env.APPDATA || process.env.HOME || '').replace(/\\/g, '/') + '/CherryStudio/Data/cherrystudio.sqlite';
-const DEFAULT_DB = process.argv[2] || defDb;
+// ---------- DB 自动探测 ----------
+// 候选列表: 常用搬迁位置 + APPDATA 默认。取第一个存在的。
+function detectDb(explicit) {
+    if (explicit && fs.existsSync(explicit)) return explicit;
+    const candidates = [
+        explicit,
+        'E:/ai/Chreey Studio/Data/cherrystudio.sqlite',
+        'E:/CherryStudio/Data/cherrystudio.sqlite',
+        'D:/CherryStudio/Data/cherrystudio.sqlite',
+        (process.env.APPDATA || '').replace(/\\/g, '/') + '/CherryStudio/Data/cherrystudio.sqlite',
+    ].filter(Boolean);
+    for (const c of candidates) {
+        if (fs.existsSync(c)) return c;
+    }
+    return candidates[candidates.length - 1];
+}
+
+const DEFAULT_DB = detectDb(process.argv[2]);
 const NEEDLE = process.argv[3] || 'CherryStudio';
 
 let db;
