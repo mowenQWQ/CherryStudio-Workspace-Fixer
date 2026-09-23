@@ -1,8 +1,8 @@
 # CherryStudio-Workspace-Fixer
 
-**v2.0.0 — Cherry Studio 工具箱：① 修复数据搬迁后的工作区路径残留（.claude.json + projects 目录名 + 数据库 agent_workspace.path 三处全覆盖，先预览、再备份、后修复、自动复查）；② 日志炸弹防护（`log_guard` 报告/清理超大错误日志，官方 #20363/#18373 修复前的客户端兜底）；③ 统一主菜单 `toolbox.bat` 一键直达。全脱敏。**
+**v2.0.1 — Cherry Studio 工具箱：① 修复数据搬迁后的工作区路径残留（.claude.json + projects 目录名 + 数据库 agent_workspace.path 三处全覆盖，先预览、再备份、后修复、自动复查）；② 日志炸弹防护（`log_guard` 报告/清理超大错误日志；对应官方 issue #20363 已于 2026-09-13 修复关闭，旧版本用户仍可用本工具清理存量超大日志）；③ 统一主菜单 `toolbox.bat` 一键直达。全脱敏。**
 
-**v2.0.0 — A Cherry Studio toolbox: ① fix leftover workspace paths after data relocation (all three locations: .claude.json + projects dir names + DB agent_workspace.path, with preview → backup → fix → recheck); ② log-bomb guard (`log_guard` reports/cleans oversized error logs, a client-side mitigation until official #20363/#18373 is fixed); ③ unified launcher `toolbox.bat`. Fully desensitized.**
+**v2.0.1 — A Cherry Studio toolbox: ① fix leftover workspace paths after data relocation (all three locations: .claude.json + projects dir names + DB agent_workspace.path, with preview → backup → fix → recheck); ② log-bomb guard (`log_guard` reports/cleans oversized error logs; the upstream issue #20363 was fixed and closed on 2026-09-13 — users on older versions can still use this tool to clean up existing oversized logs); ③ unified launcher `toolbox.bat`. Fully desensitized.**
 
 [中文](#中文) | [English](#english) | [更新日志](#更新日志-changelog)
 
@@ -38,7 +38,7 @@ scripts\toolbox.bat
 
 ### 日志炸弹防护（v2.0.0 新增）
 
-Cherry Studio 2.x 的 `AI_APICallError` 错误处理器会把完整 requestBody（含 system prompt 与全部工具定义）序列化进日志，provider 503 / `model route not found` 触发时可**单条数 MB、GB/h 级膨胀**（GitHub #20363 已由官方维护者 404-Page-Found 认领 / #18373 p1，2.0.14 仍存在）。官方修复前用本工具兜底：
+Cherry Studio 2.x 的 `AI_APICallError` 错误处理器会把完整 requestBody（含 system prompt 与全部工具定义）序列化进日志，provider 503 / `model route not found` 触发时可**单条数 MB、GB/h 级膨胀**（GitHub #20363，官方已于 2026-09-13 修复关闭；受影响版本产生的存量超大日志仍需手动清理）。老版本用户 / 已产生的日志用本工具兜底：
 
 ```bat
 rem 只读报告（默认）: 列出超大日志, 估算总大小
@@ -109,7 +109,7 @@ Menu: `[1] Log-bomb report & cleanup`, `[2] Fix workspace paths`, `[3] Probe lef
 
 ### Log-bomb guard (new in v2.0.0)
 
-Cherry Studio 2.x's `AI_APICallError` handler serializes the full requestBody (system prompt + all tool definitions) into logs; a provider 503 / `model route not found` can grow a single line to several MB and the dir by GB/h (GitHub #20363 assigned to maintainer 404-Page-Found / #18373 p1, still present in 2.0.14). Mitigate until official fix:
+Cherry Studio 2.x's `AI_APICallError` handler serializes the full requestBody (system prompt + all tool definitions) into logs; a provider 503 / `model route not found` can grow a single line to several MB and the dir by GB/h (GitHub #20363, fixed and closed upstream on 2026-09-13; existing oversized logs from affected versions still need manual cleanup). Use this tool on older versions / leftover logs:
 
 ```bat
 rem Read-only report (default): list oversized logs, estimate total size
@@ -149,10 +149,14 @@ scripts\check_agent_data.bat
 
 ## 更新日志 / Changelog
 
+### v2.0.1 (2026-09-23)
+
+- 文档修订：上游 issue #20363 已于 2026-09-13 修复关闭，README 中「官方修复前兜底」的表述更新为「老版本用户清理存量日志」；#18373 仍 open，路径修复功能不受影响
+
 ### v2.0.0 (2026-09-13)
 
 **新增**
-- `scripts/log_guard.bat` + `scripts/log_guard.js`：日志炸弹防护——只读报告超大日志 / 保留期安全清理（备份+确认+复查），官方 #20363/#18373 修复前的客户端兜底
+- `scripts/log_guard.bat` + `scripts/log_guard.js`：日志炸弹防护——只读报告超大日志 / 保留期安全清理（备份+确认+复查）；对应官方 issue #20363 已修复关闭，老版本用户仍可用其清理存量日志
 - `scripts/toolbox.bat`：统一主菜单，一键直达日志防护 / 路径修复 / 探测 / 对比
 
 **增强**
