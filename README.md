@@ -6,6 +6,8 @@
 
 [中文](#中文) | [English](#english) | [更新日志](#更新日志-changelog)
 
+> ⚠️ **AI 使用说明**：本作品由 AI 辅助生成（生成时间：2026-09-09）。仅供学习与参考使用，发布、引用或投入使用前请人工核实关键信息。
+
 ---
 
 ## 中文
@@ -175,11 +177,3 @@ scripts\check_agent_data.bat
 ## License
 
 MIT — see [LICENSE](LICENSE).
-
----
-
-## 🤖 AI 使用声明 / AI Usage Disclosure
-
-本项目在开发与维护过程中使用了 AI 编程助手（Chatbox AI / GLM）辅助代码编写、脱敏整理与问题排查；问题定位、核心决策、内容审核与最终发布由维护者完成。
-
-This project was developed and maintained with the assistance of an AI coding assistant (Chatbox AI / GLM) for coding, desensitization, and troubleshooting. Problem identification, core decisions, content review, and final release are made by the maintainer.
